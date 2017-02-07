@@ -1,0 +1,126 @@
+\documentclass[11pt]{article}
+\usepackage[english]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage {multirow}
+\title{Preparacion de datos}
+\author{Raúl Montes}
+\begin{document}
+\begin{titlepage}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+\center
+\textsc{\LARGE Universidad de Sonora}\\[1.5cm]
+\HRule \\[0.4cm]
+{ \huge \bfseries Limpieza y preparación de datos}\\[0.2cm] 
+{ \huge \bfseries usando Emacs}\\[0.4cm] 
+\HRule \\[1.1cm]
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Autor:}\\
+Raúl \textsc{Montes} 
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Profesor:} \\
+Dr. Carlos \textsc{Lizárraga} 
+\end{flushright}
+\end{minipage}\\[1.5cm]
+{\date\ 7 de febrero de 2017\large }\\[2cm] 
+\includegraphics[height=8cm]{logounison.png}\\[1cm] 
+\end{titlepage}
+
+\renewcommand{\abstractname}{Resumen}
+\begin{abstract}
+El trabajo consistió en la preparación y limpieza de datos recolectados de la red de sondeos de norteamérica. Para la actividad usamos un script que descargamos de la plataforma, el cual contenía las instrucciones de descargar los datos de sondeo de una estación a elegir, con ayuda de Emacs se editó el código para cambiar el lugar y la fecha de donde se requerían los datos. Lo siguiente fue usar la terminal para crear un documento de texto con todos los datos recolectados y poder manejarlos más fácilmente, después con ayuda de Gnuplot se hicieron dos gráficas, una temperatura-altura y otra de presión-altura usando los datos del 1 de febrero de 2017 a las 12Z. Por último se filtraron los datos del año 2016 con ayuda de la terminal para determinar cuántos días al mes se habían hecho mediciones y a que horas habían sido realizadas para posteriormente elaborar una tabla con los datos.
+\end{abstract}
+\section*{Introduccion}
+A Veces nos parece muy fácil manejar datos usando por ejemplo copy-paste, todo el tiempo juntamos datos de esta manera para hacer un mejor manejo de ellos, pero, debemos preguntarnos si es eficiente hacer esto cuando se tiene una cantidad realmente grande de datos, la respuesta es no. En esta actividad veremos que hay métodos muy eficientes para el manejo, preparación y limpieza de datos. No es un procedimiento muy complicado pero es necesario un conocimiento básico del entorno de la terminal de Linux, gráficas en gnuplot y editar textos en Emacs, ya que fueron los recursos usados para poder llevar a cabo la práctica.
+
+\section*{obtención de datos}
+Los datos empleados provienen de un sitio web perteneciente a la universidad de Wyoming, el cual contiene información acerca de la atmosfera de diferentes lugares. En el sitio se pueden obtener los datos según la región, estación, y día del año.
+Para realizar la práctica fue necesario primero elegir una estación atmosférica disponible en el sitio web. Después se procedió a editar un script proporcionado por el profesor, mediante Emacs  se cambiaron los datos de la fecha y la estación para posteriormente correr el script en la terminal de Linux.
+\section*{gráficas}
+Con los datos disponibles en la página del 1 de febrero de 2017 a las 12Z horas se creó un archivo en Emacs y con la terminal usando gnuplot se crearon dos gráficas, una de presión-altura y otra de temperatura-altura.
+\begin{center}
+\includegraphics[height=8cm]{presion-altura.png}\\[.5cm] 
+\includegraphics[height=8cm]{temperatura-altura.png}\\[.5cm] 
+\end{center}
+
+\section*{observaciones del 2016}
+Una vez descargados los archivos con ayuda del script, lo siguiente fue unirlos en un solo documento de texto. Después con ayuda de la términal, se filtriaron los datos según mes y hora, con lo que se construyo la siguiente tabla.
+\begin{table}[htbp]
+\begin{center}
+\begin{tabular}{|l|l|l|}
+\hline \hline
+mes & 00Z & 12Z  \\
+\hline \hline
+Enero & 0 & 27 \\ \hline
+Febrero & 0 & 3\\ \hline
+Marzo & 0 & 0\\ \hline
+Abril & 0 & 0 \\ \hline
+Mayo & 0 & 0 \\ \hline
+Junio & 0 & 0 \\ \hline
+Julio & 0 & 11 \\ \hline
+Agosto & 0 & 29 \\ \hline
+Septiembre & 1 & 23 \\ \hline
+Octubre & 1 & 7 \\ \hline
+Noviembre & 0 & 0 \\ \hline
+Diciembre & 7 & 8 \\ \hline
+\end{tabular}
+\caption{observaciones realizadas a las 00Z y 12Z horas.}
+\label{tabla:sencilla}
+\end{center}
+\end{table}
+\section*{Preparación de datos}
+Para preparar los datos y poder hacer correcto uso de la información fue necesario estar familiarizado con el entorno de Emacs, Gnuplot y Linux. Fueron de gran utilidad funciones como "queri replace" para modificar el script así como ctrl-x y ctrl-s para salvarlo. Al graficar fue necesario conocer el entorno de gnuplot para poder ajustar los encabezados e identificar las columnas a graficar. Probablemente lo más importante en esta actividad fue el uso de los comandos “grep” y “wc” para filtrar datos y mostrar los datos disponibles en pantalla, fue así como pudieron analizarse las observaciones hechas en 2016 para posteriormente vaciarse la tabla 1. \\
+\\
+\section*{Texto usado en Emacs(sin modificar)}
+\begin{verbatim}
+
+# Descarga por mes. Cambiar año de consulta. Ajustar el numero de estacion.
+#!/bin/bash
+# Despues de editar: chmod 755 script1.sh
+# Para ejecutar: ./script1.sh
+
+IFS=":"
+LISTM31="01:03:05:07:08:10:12"
+#LISTM31="01:03:05:07"
+LISTM30="04:06:09:11"
+#LISTM30="04:06"
+LISTM28="02"
+
+# Script para bajar info por mes. Año 2016, dentro del URL:  YEAR=2015
+# Months 31 days
+
+for i in $LISTM31 ; do
+    /usr/bin/wget "http://weather.uwyo.edu/cgi-bin/sounding?region=naconf&TYPE=TEXT%3ALIST&YEAR=2016&MONTH=$i&FROM=0100&TO=3112&STNM=76256"
+       /bin/sleep 5
+
+done
+# Months 30 days
+
+for i in $LISTM30 ; do
+    /usr/bin/wget "http://weather.uwyo.edu/cgi-bin/sounding?region=naconf&TYPE=TEXT%3ALIST&YEAR=2016&MONTH=$i&FROM=0100&TO=3012&STNM=76256"
+
+       /bin/sleep 5
+
+done
+# Feb. 28 days
+
+for i in $LISTM28 ; do
+    /usr/bin/wget "http://weather.uwyo.edu/cgi-bin/sounding?region=naconf&TYPE=TEXT%3ALIST&YEAR=2016&MONTH=$i&FROM=0100&TO=2812&STNM=76256"
+
+       /bin/sleep 5
+done
+\end{verbatim}
+\renewcommand{\refname}{Bibliografía}
+\begin{thebibliography}{9}
+\bibitem{a1}, \textsc{www.weather.uwyo.edu}
+\textit{Empalme,Son. Observations}, 2017.
+\bibitem{t1}, \textsc{progfortran.pbworks.com}
+\textit{01Linux}, 2017
+\bibitem{e1}, \textsc{www.minisconlatex.blogspot.mx}
+\textit{Tablas con latex}, 2017.
+\end{thebibliography}
+\end{document}
